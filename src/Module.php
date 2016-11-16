@@ -12,16 +12,6 @@ use Zend\Mvc\MvcEvent;
 class Module
 {
     /**
-     * @param MvcEvent $e
-     */
-    public function onBootstrap(MvcEvent $e)
-    {
-        $eventManager = $e->getApplication()->getEventManager();
-        $moduleRouteListener = new ModuleRouteListener();
-        $moduleRouteListener->attach($eventManager);
-    }
-
-    /**
      * @return array
      */
     public function getConfig()
