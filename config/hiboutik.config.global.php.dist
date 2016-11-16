@@ -1,0 +1,11 @@
+<?php
+return [
+    'hiboutik' => [
+        'debug' => false,
+        'api' => [
+            'account' => 'my-shop',
+            'user' => 'name@my-shop.com',
+            'key' => '54654654HHGFHG6FSDF43543543543'
+        ]
+    ]
+];
