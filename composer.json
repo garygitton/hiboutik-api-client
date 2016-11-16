@@ -1,0 +1,28 @@
+{
+  "name": "garygitton/hiboutik-api-client",
+  "description": "Hiboutik API Client",
+  "homepage": "http://github.com/garygitton/hiboutik-api-client",
+  "license": "MIT",
+  "require": {
+    "php": ">=7.0",
+    "hiboutik/hiboutikapi": "^1.0",
+    "guzzlehttp/guzzle": "^6.2",
+    "zendframework/zend-servicemanager": "^3.1"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~5.6.2",
+    "phploc/phploc": "~3.0.1",
+    "phpmd/phpmd": "~2.4.3",
+    "sebastian/phpcpd": "~2.0.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "Hiboutik\\Api\\Client\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Hiboutik\\Api\\Client\\Test\\": "test/"
+    }
+  }
+}
