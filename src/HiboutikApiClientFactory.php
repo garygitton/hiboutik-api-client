@@ -2,25 +2,40 @@
 
 namespace Hiboutik\Api\Client;
 
+use GuzzleHttp\Client;
+use Interop\Container\ContainerInterface;
+use Zend\Hydrator\ClassMethods;
+use Zend\Hydrator\HydratorPluginManager;
 
+/**
+ * Class HiboutikApiClientFactory
+ * @package Hiboutik\Api\Client
+ */
 class HiboutikApiClientFactory
 {
     /**
-     * @param ServiceLocatorInterface $services
+     * @param ContainerInterface $services
      * @return HiboutikApiClient
      */
-    public function __invoke($services)
+    public function __invoke(ContainerInterface $services)
     {
+        /** @var array $globalConfig */
+        /** @var HydratorPluginManager $hydrators */
+        /** @var ClassMethods $hydrator */
+        /** @var Client $httpClient */
+
         $globalConfig = $services->get('config');
         $config = $this->getConfig($globalConfig);
+        $httpClient = $services->get('http-client');
+        $hydrators = $services->get('HydratorManager');
+        $hydrator = $hydrators->get('class-methods');
+        
+        $instance = new HiboutikApiClient();
+        $instance->setConfig($config);
+        $instance->setHttpClient($httpClient);
+        $instance->setHydrator($hydrator);
 
-        $client = new HiboutikApiClient();
-        $client->setAccount($config['api']['account']);
-        $client->setUser($config['api']['user']);
-        $client->setKey($config['api']['key']);
-        $client->setDebug($config['debug']);
-
-        return $client;
+        return $instance;
     }
 
     /**

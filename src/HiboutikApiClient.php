@@ -2,104 +2,71 @@
 
 namespace Hiboutik\Api\Client;
 
-use GuzzleHttp\Client;
-use ZFTest\Hal\TestAsset\JsonSerializable;
+use GuzzleHttp\ClientInterface;
+use Zend\Hydrator\ClassMethods;
+use Zend\Hydrator\HydratorInterface;
 
 /**
  * Class HiboutikApiClient
  * @package Hiboutik\Api\Client
  */
-class HiboutikApiClient extends Client
+class HiboutikApiClient 
 {
     const VERSION_API = '1.0.1';
 
-    /**
-     * Account name of the shop
-     *
-     * Example: myShop
-     *
-     * @var string
-     */
-    protected $account;
+    protected $config = [
+        'debug' => false,
+        'api' => [
+            'account' => '',
+            'user' => '',
+            'key' => ''
+        ]
+    ];
 
     /**
-     * Email Address of the user
-     *
-     * Example: name@my-shop.com
-     *
-     * @var string
+     * @var ClientInterface
      */
-    protected $user;
+    protected $httpClient;
 
     /**
-     * Api Key of the user
-     *
-     * Example: FDFDSFSD646478768YUTUTYUTJJGHHJHGHJ
-     *
-     * @var string
+     * @var HydratorInterface
      */
-    protected $key;
-
+    protected $hydrator;
+    
     /**
-     * Base url of the api construct
-     *
-     * @var string
+     * @param $resource
+     * @return array
      */
-    protected $baseUrl;
-
-    /**
-     * @var string
-     */
-    protected $userAgent;
-
-    /**
-     * @var bool
-     */
-    protected $debug = false;
-
-    /**
-     * Guzzle options
-     *
-     * @var array
-     */
-    protected $options;
-
-    public function fetch($resource, $id)
-    {
-        return $this->fetchAll($resource);
-    }
-
     public function fetchAll($resource)
     {
-        $options = $this->getOptions();
         $uri = $this->getBaseUrl().'/'.$resource;
 
-        $response = $this->request('GET', $uri, $options);
-        $data = $response->getBody();
+        $data = $this->request('GET', $uri);
+        $modelEntity = $this->createEntityForResource($resource);
 
-        return $data;
+        $entities = [];
+        foreach($data as $datum) {
+            $datum = $this->reduceDataKey((array) $datum);
+            $entity = clone $modelEntity;
+            $entity = $this->hydrator->hydrate($datum, $entity);
+            $entities[$entity->getId()] = $entity;
+        }
+
+        return $entities;
     }
 
     public function create($resource, \JsonSerializable $data)
     {
-        $options = $this->getOptions();
-        $options['body'] = json_encode($data);
         $uri = $this->getBaseUrl().'/'.$resource;
-
-        $response = $this->request('POST', $uri, $options);
-        $data = $response->getBody();
+        $data = $this->request('POST', $uri, $data);
 
         return $data;
     }
 
     public function update($resource, \JsonSerializable $data)
     {
-        $options = $this->getOptions();
-        $options['body'] = json_encode($data);
         $uri = $this->getBaseUrl().'/'.$resource;
-
-        $response = $this->request('PUT', $uri, $options);
-        $data = $response->getBody();
+        $data = $this->request('PUT', $uri, $data);
 
         return $data;
     }
@@ -107,83 +74,117 @@ class HiboutikApiClient extends Client
     public function delete($resource, $id)
     {
         $uri = $this->getBaseUrl().'/'.$resource.'/'.$id;
-        $response = $this->request('DELETE', $uri, $this->getOptions());
-        $data = $response->getBody();
+        $data = $this->request('DELETE', $uri);
 
         return $data;
     }
 
+    /**
+     * @return string
+     */
     public function getBaseUrl()
     {
-        if (!$this->baseUrl) {
-            $this->baseUrl = "https://" . $this->account . ".hiboutik.com/apirest";
-        }
-
-        return $this->baseUrl;
+        return "https://" . $this->config['api']['account'] . ".hiboutik.com/apirest";
     }
 
-    public function getUserAgent()
-    {
-        if (!$this->userAgent) {
-            $curlVersion = curl_version();
-
-            $this->userAgent = "HiboutikAPI v" . self::VERSION_API;
-            $this->userAgent .= " (+https://github.com/garygitton/hiboutik-api-client)";
-            $this->userAgent .= " PHP/" . PHP_VERSION;
-            $this->userAgent .= ' curl/' . $curlVersion['version'];
-        }
-
-        return $this->userAgent;
-    }
-
+    /**
+     * @return array
+     */
     public function getOptions()
     {
-        if (!$this->options) {
-            $this->options = [
-                'auth' => [
-                    $this->user,
-                    $this->key
-                ],
-                'headers' => [
-                    'User-Agent' => $this->getUserAgent(),
-                    'Accept' => 'application/json',
-                    'Content-Type' => 'application/json'
-                ]
-            ];
+        $curlVersion = curl_version();
+
+        $userAgent = "HiboutikAPI v" . self::VERSION_API;
+        $userAgent .= " (+https://github.com/garygitton/hiboutik-api-client)";
+        $userAgent .= " PHP/" . PHP_VERSION;
+        $userAgent .= ' curl/' . $curlVersion['version'];
+
+        $options = [
+            'auth' => [
+                $this->config['api']['user'],
+                $this->config['api']['key']
+            ],
+            'headers' => [
+                'User-Agent' => $userAgent,
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ]
+        ];
+
+        return $options;
+    }
+
+    /**
+     * @param $method
+     * @param string $uri
+     * @param \JsonSerializable|null $entity
+     * @return array $data
+     */
+    public function request($method, $uri = '', \JsonSerializable $entity = null)
+    {
+        $options = $this->getOptions();
+
+        if($entity) {
+            $options['body'] = $entity->jsonSerialize();
         }
 
-        return $this->options;
+        $response = $this->httpClient->request($method, $uri, $options);
+        $stream = $response->getBody();
+        $contents = $stream->getContents();
+        $data = json_decode($contents);
+
+        return $data;
+    }
+
+    public function reduceDataKey($data)
+    {
+        $newData = [];
+        foreach($data as $key => $value) {
+            $keyParts = explode('_', $key);
+            array_shift($keyParts);
+            $newKey = implode('_', $keyParts);
+            $newData[$newKey] = $data[$key];
+        }
+
+        return $newData;
     }
 
     /**
-     * @param string $key
+     * @param $resource
+     * @return mixed
      */
-    public function setKey($key)
+    public function createEntityForResource($resource)
     {
-        $this->key = $key;
+        $resource = preg_replace('/s$/', '', $resource);
+        $resource = preg_replace('/ies$/', 'y', $resource);
+        $resource = ucfirst($resource);
+        $fqcn = '\\Hiboutik\Api\\Client\\Entity\\'.$resource;
+        $instance = new $fqcn();
+
+        return $instance;
     }
 
     /**
-     * @param string $user
+     * @param $config
      */
-    public function setUser($user)
+    public function setConfig($config)
     {
-        $this->user = $user;
+        $this->config = $config;
     }
 
     /**
-     * @param string $account
+     * @param ClientInterface $httpClient
      */
-    public function setAccount($account)
+    public function setHttpClient(ClientInterface $httpClient)
     {
-        $this->account = $account;
+        $this->httpClient = $httpClient;
     }
 
     /**
-     * @param boolean $debug
+     * @param HydratorInterface $hydrator
      */
-    public function setDebug($debug)
+    public function setHydrator(HydratorInterface $hydrator) 
     {
-        $this->debug = $debug;
+        $this->hydrator = $hydrator;
     }
 }
