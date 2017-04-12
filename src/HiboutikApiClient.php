@@ -47,7 +47,6 @@ class HiboutikApiClient
 
         $hydrator = new HiboutikApiClientHydrator();
         $hydrator->hydrate($dataRow, $entity);
-        
 
         $data = $this->reduceDataKey((array) $data[0]);
 
