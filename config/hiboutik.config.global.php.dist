@@ -3,8 +3,22 @@ return [
     'hiboutik' => [
         'debug' => false,
         'api' => [
+            /**
+             * Account name of the shop
+             * Example: myShop
+             */
             'account' => 'my-shop',
+
+            /**
+             * Email Address of the user
+             * Example: name@my-shop.com
+             */
             'user' => 'name@my-shop.com',
+
+            /**
+             * Api Key of the user
+             * Example: FDFDSFSD646478768YUTUTYUTJJGHHJHGHJ
+             */
             'key' => '54654654HHGFHG6FSDF43543543543'
         ]
     ]

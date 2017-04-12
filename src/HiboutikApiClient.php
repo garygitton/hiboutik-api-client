@@ -3,14 +3,13 @@
 namespace Hiboutik\Api\Client;
 
 use GuzzleHttp\ClientInterface;
-use Zend\Hydrator\ClassMethods;
 use Zend\Hydrator\HydratorInterface;
 
 /**
  * Class HiboutikApiClient
  * @package Hiboutik\Api\Client
  */
-class HiboutikApiClient 
+class HiboutikApiClient
 {
     const VERSION_API = '1.0.1';
 
@@ -32,7 +31,29 @@ class HiboutikApiClient
      * @var HydratorInterface
      */
     protected $hydrator;
-    
+
+    /**
+     * @param $resource
+     * @param $id
+     * @return mixed
+     */
+    public function fetch($resource, $id)
+    {
+        $uri = $this->getBaseUrl().'/'.$resource.'/'.$id;
+        $data = $this->request('GET', $uri);
+        $dataRow = (array) $data[0];
+
+        $entity = $this->createEntityWithResourceName($resource);
+
+        $hydrator = new HiboutikApiClientHydrator();
+        $hydrator->hydrate($dataRow, $entity);
+        
+
+        $data = $this->reduceDataKey((array) $data[0]);
+
+        return $entity;
+    }
+
     /**
      * @param $resource
      * @return array
@@ -42,7 +63,7 @@ class HiboutikApiClient
         $uri = $this->getBaseUrl().'/'.$resource;
 
         $data = $this->request('GET', $uri);
-        $modelEntity = $this->createEntityForResource($resource);
+        $modelEntity = $this->createEntityWithResourceName($resource);
 
         $entities = [];
         foreach($data as $datum) {
@@ -55,6 +76,11 @@ class HiboutikApiClient
         return $entities;
     }
 
+    /**
+     * @param $resource
+     * @param \JsonSerializable $data
+     * @return array|\JsonSerializable
+     */
     public function create($resource, \JsonSerializable $data)
     {
         $uri = $this->getBaseUrl().'/'.$resource;
@@ -63,6 +89,11 @@ class HiboutikApiClient
         return $data;
     }
 
+    /**
+     * @param $resource
+     * @param \JsonSerializable $data
+     * @return array|\JsonSerializable
+     */
     public function update($resource, \JsonSerializable $data)
     {
         $uri = $this->getBaseUrl().'/'.$resource;
@@ -71,6 +102,11 @@ class HiboutikApiClient
         return $data;
     }
 
+    /**
+     * @param $resource
+     * @param $id
+     * @return array
+     */
     public function delete($resource, $id)
     {
         $uri = $this->getBaseUrl().'/'.$resource.'/'.$id;
@@ -136,6 +172,10 @@ class HiboutikApiClient
         return $data;
     }
 
+    /**
+     * @param $data
+     * @return array
+     */
     public function reduceDataKey($data)
     {
         $newData = [];
@@ -150,15 +190,21 @@ class HiboutikApiClient
     }
 
     /**
-     * @param $resource
-     * @return mixed
+     * @param $resourceName
+     * @return bool
      */
-    public function createEntityForResource($resource)
+    public function createEntityWithResourceName($resourceName)
     {
-        $resource = preg_replace('/s$/', '', $resource);
-        $resource = preg_replace('/ies$/', 'y', $resource);
-        $resource = ucfirst($resource);
-        $fqcn = '\\Hiboutik\Api\\Client\\Entity\\'.$resource;
+        $resourceName = preg_replace('/s$/', '', $resourceName);
+        $resourceName = preg_replace('/ies$/', 'y', $resourceName);
+        $resourceName = ucfirst($resourceName);
+
+        $fqcn = '\\Hiboutik\Api\\Client\\Entity\\'.$resourceName;
+
+        if(!class_exists($fqcn)) {
+            throw new \RuntimeException('Class named '.$fqcn.' does not exist');
+        }
+
         $instance = new $fqcn();
 
         return $instance;
@@ -183,7 +229,7 @@ class HiboutikApiClient
     /**
      * @param HydratorInterface $hydrator
      */
-    public function setHydrator(HydratorInterface $hydrator) 
+    public function setHydrator(HydratorInterface $hydrator)
     {
         $this->hydrator = $hydrator;
     }

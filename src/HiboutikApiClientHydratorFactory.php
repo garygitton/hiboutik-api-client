@@ -11,29 +11,13 @@ use Zend\Hydrator\HydratorPluginManager;
  * Class HiboutikApiClientFactory
  * @package Hiboutik\Api\Client
  */
-class HiboutikApiClientFactory
+class HiboutikApiClientHydratorFactory
 {
-    /**
-     * @param ContainerInterface $services
-     * @return HiboutikApiClient
-     */
-    public function __invoke(ContainerInterface $services)
+    public function __invoke(ContainerInterface $container)
     {
-        /** @var array $globalConfig */
-        /** @var HydratorPluginManager $hydrators */
-        /** @var ClassMethods $hydrator */
-        /** @var Client $httpClient */
+        $hydrators = $container->get('ClassMethods');
 
-        $globalConfig = $services->get('config');
-        $config = $this->getConfig($globalConfig);
-        $httpClient = $services->get('http-client');
-        $hydrators = $services->get('HydratorManager');
-        $hydrator = $hydrators->get('Hiboutik\Api\Client\HiboutikApiClientHydrator');
-        
         $instance = new HiboutikApiClient();
-        $instance->setConfig($config);
-        $instance->setHttpClient($httpClient);
-        $instance->setHydrator($hydrator);
 
         return $instance;
     }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit bootstrap="./test/Bootstrap.php">
     <testsuites>
-        <testsuite name="common">
+        <testsuite name="Hiboutik API Client">
             <directory>./test</directory>
         </testsuite>
     </testsuites>

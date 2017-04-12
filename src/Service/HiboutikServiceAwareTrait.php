@@ -19,6 +19,16 @@ trait HiboutikServiceAwareTrait
     protected $productService;
 
     /**
+     * @var SaleService
+     */
+    protected $saleService;
+
+    /**
+     * @var CustomerService
+     */
+    protected $customerService;
+
+    /**
      * @param StoreService $storeService
      */
     public function setStoreService(StoreService $storeService)
@@ -32,5 +42,21 @@ trait HiboutikServiceAwareTrait
     public function setProductService(ProductService $productService)
     {
         $this->productService = $productService;
+    }
+
+    /**
+     * @param CustomerService $customerService
+     */
+    public function setCustomerService(CustomerService $customerService)
+    {
+        $this->customerService = $customerService;
+    }
+
+    /**
+     * @param SaleService $saleService
+     */
+    public function setSaleService(SaleService $saleService)
+    {
+        $this->saleService = $saleService;
     }
 }

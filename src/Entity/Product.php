@@ -105,6 +105,16 @@ class Product
     protected $specificRules;
 
     /**
+     * @var string
+     */
+    protected $pointsIn;
+
+    /**
+     * @var string
+     */
+    protected $pointsOut;
+
+    /**
      * Product constructor.
      */
     public function __construct()
@@ -431,5 +441,37 @@ class Product
     public function setSpecificRules($specificRules)
     {
         $this->specificRules = $specificRules;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPointsIn()
+    {
+        return $this->pointsIn;
+    }
+
+    /**
+     * @param string $pointsIn
+     */
+    public function setPointsIn($pointsIn)
+    {
+        $this->pointsIn = $pointsIn;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPointsOut()
+    {
+        return $this->pointsOut;
+    }
+
+    /**
+     * @param string $pointsOut
+     */
+    public function setPointsOut($pointsOut)
+    {
+        $this->pointsOut = $pointsOut;
     }
 }
