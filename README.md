@@ -36,9 +36,11 @@ The module describe the following element from hiboutik
 * GET Store by ID => Done
 * LIST Stores => Done
 
-
 ### Products Services
 * LIST Products => Done
+
+### Sizes Services
+* GET All sizes by size type
 
 
 
