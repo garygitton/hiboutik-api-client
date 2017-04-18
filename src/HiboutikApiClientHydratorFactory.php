@@ -15,8 +15,6 @@ class HiboutikApiClientHydratorFactory
 {
     public function __invoke(ContainerInterface $container)
     {
-        $hydrators = $container->get('ClassMethods');
-
         $instance = new HiboutikApiClient();
 
         return $instance;

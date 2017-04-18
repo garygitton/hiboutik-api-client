@@ -27,13 +27,10 @@ class HiboutikApiClientFactory
         $globalConfig = $services->get('config');
         $config = $this->getConfig($globalConfig);
         $httpClient = $services->get('http-client');
-        $hydrators = $services->get('HydratorManager');
-        $hydrator = $hydrators->get('Hiboutik\Api\Client\HiboutikApiClientHydrator');
-        
+
         $instance = new HiboutikApiClient();
         $instance->setConfig($config);
         $instance->setHttpClient($httpClient);
-        $instance->setHydrator($hydrator);
 
         return $instance;
     }
