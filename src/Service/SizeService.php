@@ -13,12 +13,7 @@ class SizeService extends HiboutikService
     const RESOURCE_NAME = 'sizes';
 
     /**
-     * @var array $cache
-     */
-    protected $sizes = [];
-
-    /**
-     * Ok for the moment only support size of tyme TIMEE !!
+     * Ok for the moment only support size of type TIMEE !!
      * @param SizeType $sizeType
      * @param $name
      * @return Size|null

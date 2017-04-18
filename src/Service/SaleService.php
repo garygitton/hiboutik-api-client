@@ -10,11 +10,6 @@ class SaleService extends HiboutikService
 {
     const RESOURCE_NAME = 'sales';
 
-    /**
-     * @var array $cache
-     */
-    protected $sales = [];
-
     public function fetchAll()
     {
         $this->sales = $this->client->fetchAll(self::RESOURCE_NAME);

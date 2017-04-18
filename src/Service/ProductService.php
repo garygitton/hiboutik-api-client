@@ -9,11 +9,6 @@ namespace Hiboutik\Api\Client\Service;
 class ProductService extends HiboutikService
 {
     const RESOURCE_NAME = 'products';
-    
-    /**
-     * @var array $cache
-     */
-    protected $products = [];
 
     /**
      * Return details of a sale

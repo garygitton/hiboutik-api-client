@@ -35,6 +35,9 @@ class CustomerService extends HiboutikService
         return $customer;
     }
 
+    /**
+     * @param Customer $customer
+     */
     public function save(Customer $customer)
     {
         $customerData = $customer->getArrayCopy();

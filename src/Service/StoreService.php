@@ -10,11 +10,6 @@ class StoreService extends HiboutikService
 {
     const RESOURCE_NAME = 'stores';
 
-    /**
-     * @var array $cache
-     */
-    protected $stores = [];
-
     public function fetchAll()
     {
         $this->stores = $this->client->fetchAll(self::RESOURCE_NAME);
