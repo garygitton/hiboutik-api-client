@@ -1,5 +1,4 @@
 <?php
-
 namespace Hiboutik\Api\Client;
 
 use Hiboutik\Api\Client\Service\HiboutikServiceAbstractFactory;
@@ -11,7 +10,7 @@ return [
             'http-client' => HttpClient::class
         ],
         'factories' => [
-            HiboutikApiClient::class => HiboutikApiClientFactory::class
+            HiboutikApiClient::class => HiboutikApiClientFactory::class,
         ],
         'abstract_factories' => [
             HiboutikServiceAbstractFactory::class

@@ -1,6 +1,8 @@
 <?php
-
 namespace Hiboutik\Api\Client\Service;
+
+use Hiboutik\Api\Client\Entity\Customer;
+use Hiboutik\Api\Client\Entity\CustomerUpdate;
 
 /**
  * Class SaleService
@@ -8,26 +10,64 @@ namespace Hiboutik\Api\Client\Service;
  */
 class CustomerService extends HiboutikService
 {
-    const RESOURCE_NAME = 'customers';
-
     /**
-     * @var array $cache
+     * @param $email
+     * @return Customer
      */
-    protected $customers = [];
-
-    public function fetchAll()
+    public function getByEmail($email)
     {
-        $this->stores = $this->client->fetchAll(self::RESOURCE_NAME);
+        $customer = new Customer();
+        $customer->setIsNew(false);
 
-        return $this->stores;
-    }
+        try {
+            $dataCustomers = $this->client->fetchAll('search/customers?email=' . $email);
+        } catch (\Exception $e) {
 
-    public function fetch($id)
-    {
-        if (!$this->stores) {
-            $this->fetchAll();
+            $customer->setEmail($email);
+            $customer->setIsNew(true);
+
+            $this->client->create('customers', $customer);
+            $dataCustomers = $this->client->fetchAll('search/customers?email=' . $customer->getEmail());
         }
 
-        return $this->stores[$id];
+        $customer->exchangeArray($dataCustomers[0]);
+
+        return $customer;
+    }
+
+    public function save(Customer $customer)
+    {
+        $customerData = $customer->getArrayCopy();
+
+        $ignoredAttributes = [
+            'email',
+            'tax_number',
+            'birth_date',
+            'phone_number',
+            'customers_first_name',
+            'customers_last_name',
+            'customers_email',
+            'customers_country',
+            'customers_tax_number',
+            'customers_birth_date',
+            'customers_phone_number',
+        ];
+
+        foreach ($customerData as $attribute => $value) {
+            if(in_array($attribute, $ignoredAttributes)) {
+                continue;
+            }
+
+            $customerUpdate = new CustomerUpdate();
+            $customerUpdate->setId($customer->getId());
+            $customerUpdate->setAttribute($attribute);
+            $customerUpdate->setNewValue($value);
+
+            try {
+                $this->client->update('customer/' . $customer->getId(), $customerUpdate);
+            }  catch(\Exception $e) {
+                error_log($e->getMessage());
+            }
+        }
     }
 }

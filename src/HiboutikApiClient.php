@@ -43,6 +43,8 @@ class HiboutikApiClient
         $data = $this->request('GET', $uri);
         $dataRow = (array) $data[0];
 
+        return $dataRow;
+
         $entity = $this->createEntityWithResourceName($resource);
 
         $hydrator = new HiboutikApiClientHydrator();
@@ -62,7 +64,14 @@ class HiboutikApiClient
         $uri = $this->getBaseUrl().'/'.$resource;
 
         $data = $this->request('GET', $uri);
-        $modelEntity = $this->createEntityWithResourceName($resource);
+
+        try {
+            $modelEntity = $this->createEntityWithResourceName($resource);
+        } catch(\Error $e) {
+            return $data;
+        } catch(\Exception $e) {
+            return $data;
+        }
 
         $entities = [];
         foreach($data as $datum) {
@@ -142,7 +151,7 @@ class HiboutikApiClient
             'headers' => [
                 'User-Agent' => $userAgent,
                 'Accept' => 'application/json',
-                'Content-Type' => 'application/json'
+                'Content-Type' => 'application/x-www-form-urlencoded'
             ]
         ];
 
@@ -160,13 +169,13 @@ class HiboutikApiClient
         $options = $this->getOptions();
 
         if($entity) {
-            $options['body'] = $entity->jsonSerialize();
+            $options['form_params'] = $entity->jsonSerialize();
         }
 
         $response = $this->httpClient->request($method, $uri, $options);
         $stream = $response->getBody();
         $contents = $stream->getContents();
-        $data = json_decode($contents);
+        $data = json_decode($contents, true);
 
         return $data;
     }
