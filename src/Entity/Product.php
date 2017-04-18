@@ -1,7 +1,10 @@
 <?php
-
 namespace Hiboutik\Api\Client\Entity;
 
+/**
+ * Class Product
+ * @package Hiboutik\Api\Client\Entity
+ */
 class Product
 {
     /**
@@ -45,12 +48,12 @@ class Product
     protected $supplyPrice;
 
     /**
-     * @var int
+     * @var Category
      */
     protected $category;
 
     /**
-     * @var int
+     * @var SizeType
      */
     protected $sizeType;
 
@@ -95,14 +98,14 @@ class Product
     protected $serialNumber;
 
     /**
-     * @var \ArrayObject
+     * @var array
      */
-    protected $sizeDetails;
+    protected $sizeDetails = [];
 
     /**
-     * @var \ArrayObject
+     * @var array
      */
-    protected $specificRules;
+    protected $specificRules = [];
 
     /**
      * @var string
@@ -115,13 +118,14 @@ class Product
     protected $pointsOut;
 
     /**
-     * Product constructor.
+     * @var int
      */
-    public function __construct()
-    {
-        $this->sizeDetails = new \ArrayObject();
-        $this->specificRules = new \ArrayObject();
-    }
+    protected $points;
+
+    /**
+     * @var string
+     */
+    protected $comments;
 
     /**
      * @return int
@@ -252,7 +256,7 @@ class Product
     }
 
     /**
-     * @return int
+     * @return Category
      */
     public function getCategory()
     {
@@ -260,7 +264,7 @@ class Product
     }
 
     /**
-     * @param int $category
+     * @param Category $category
      */
     public function setCategory($category)
     {
@@ -268,7 +272,7 @@ class Product
     }
 
     /**
-     * @return int
+     * @return SizeType
      */
     public function getSizeType()
     {
@@ -276,7 +280,7 @@ class Product
     }
 
     /**
-     * @param int $sizeType
+     * @param SizeType $sizeType
      */
     public function setSizeType($sizeType)
     {
@@ -284,7 +288,7 @@ class Product
     }
 
     /**
-     * @return int
+     * @return Size
      */
     public function getSize()
     {
@@ -292,7 +296,7 @@ class Product
     }
 
     /**
-     * @param int $size
+     * @param Size $size
      */
     public function setSize($size)
     {
@@ -412,7 +416,7 @@ class Product
     }
 
     /**
-     * @return \ArrayObject
+     * @return array
      */
     public function getSizeDetails()
     {
@@ -420,15 +424,15 @@ class Product
     }
 
     /**
-     * @param \ArrayObject $sizeDetails
+     * @param array $sizeDetails
      */
-    public function setSizeDetails($sizeDetails)
+    public function setSizeDetails(array $sizeDetails)
     {
         $this->sizeDetails = $sizeDetails;
     }
 
     /**
-     * @return \ArrayObject
+     * @return array
      */
     public function getSpecificRules()
     {
@@ -473,5 +477,37 @@ class Product
     public function setPointsOut($pointsOut)
     {
         $this->pointsOut = $pointsOut;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPoints()
+    {
+        return $this->points;
+    }
+
+    /**
+     * @param int $points
+     */
+    public function setPoints($points)
+    {
+        $this->points = $points;
+    }
+
+    /**
+     * @return string
+     */
+    public function getComments()
+    {
+        return $this->comments;
+    }
+
+    /**
+     * @param string $comments
+     */
+    public function setComments($comments)
+    {
+        $this->comments = $comments;
     }
 }

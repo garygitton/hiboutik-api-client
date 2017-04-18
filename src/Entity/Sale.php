@@ -1,17 +1,26 @@
 <?php
-
 namespace Hiboutik\Api\Client\Entity;
 
 /**
  * Class Sale
  * @package Hiboutik\Api\Client\Entity
  */
-class Sale
+class Sale implements \JsonSerializable
 {
     /**
      * @var int
      */
     protected $id;
+
+    /**
+     * @var Store
+     */
+    protected $store;
+
+    /**
+     * @var Customer
+     */
+    protected $customer;
 
     /**
      * @var string
@@ -26,22 +35,12 @@ class Sale
     /**
      * @var int
      */
-    protected $storeId;
-
-    /**
-     * @var int
-     */
     protected $vendorId;
 
     /**
      * @var int
      */
     protected $uniqueSaleId;
-
-    /**
-     * @var int
-     */
-    protected $customerId;
 
     /**
      * @var int
@@ -98,10 +97,17 @@ class Sale
      */
     protected $lineItems;
 
-    public function __construct()
-    {
-        $this->lineItems = new \ArrayObject();
-    }
+    /**
+     * Antedate the sale
+     *
+     * @var \DateTime
+     */
+    protected $dateZ;
+
+    /**
+     * @var string
+     */
+    protected $comment;
 
     /**
      * @return int
@@ -117,6 +123,38 @@ class Sale
     public function setId($id)
     {
         $this->id = $id;
+    }
+
+    /**
+     * @return Store
+     */
+    public function getStore()
+    {
+        return $this->store;
+    }
+
+    /**
+     * @param Store $store
+     */
+    public function setStore($store)
+    {
+        $this->store = $store;
+    }
+
+    /**
+     * @return Customer
+     */
+    public function getCustomer()
+    {
+        return $this->customer;
+    }
+
+    /**
+     * @param Customer $customer
+     */
+    public function setCustomer($customer)
+    {
+        $this->customer = $customer;
     }
 
     /**
@@ -154,22 +192,6 @@ class Sale
     /**
      * @return int
      */
-    public function getStoreId()
-    {
-        return $this->storeId;
-    }
-
-    /**
-     * @param int $storeId
-     */
-    public function setStoreId($storeId)
-    {
-        $this->storeId = $storeId;
-    }
-
-    /**
-     * @return int
-     */
     public function getVendorId()
     {
         return $this->vendorId;
@@ -197,22 +219,6 @@ class Sale
     public function setUniqueSaleId($uniqueSaleId)
     {
         $this->uniqueSaleId = $uniqueSaleId;
-    }
-
-    /**
-     * @return int
-     */
-    public function getCustomerId()
-    {
-        return $this->customerId;
-    }
-
-    /**
-     * @param int $customerId
-     */
-    public function setCustomerId($customerId)
-    {
-        $this->customerId = $customerId;
     }
 
     /**
@@ -389,5 +395,63 @@ class Sale
     public function setLineItems($lineItems)
     {
         $this->lineItems = $lineItems;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getDateZ()
+    {
+        return $this->dateZ;
+    }
+
+    /**
+     * @param \DateTime $dateZ
+     */
+    public function setDateZ($dateZ)
+    {
+        $this->dateZ = $dateZ;
+    }
+
+    /**
+     * @return string
+     */
+    public function getComment()
+    {
+        return $this->comment;
+    }
+
+    /**
+     * @param string $comment
+     */
+    public function setComment($comment)
+    {
+        $this->comment = $comment;
+    }
+
+    function jsonSerialize()
+    {
+        $data = [
+            'sale_id' => $this->id,
+            'duty_free_sale' => $this->dutyFreeSale,
+            'prices_without_taxes' => $this->pricesWithoutTaxes,
+            'currency_code' => $this->currencyCode,
+            'comments' => $this->comment,
+            'vendor_id' => $this->vendorId
+        ];
+
+        if($this->store instanceof Store) {
+            $data['store_id'] = $this->store->getId();
+        }
+
+        if($this->customer instanceof Customer) {
+            $data['customer_id'] = $this->customer->getId();
+        }
+
+        if($this->dateZ instanceof \DateTime) {
+            $data['date_z'] = $this->dateZ->format('Y-m-d');
+        }
+
+        return $data;
     }
 }

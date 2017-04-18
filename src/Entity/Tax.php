@@ -1,7 +1,10 @@
 <?php
-
 namespace Hiboutik\Api\Client\Entity;
 
+/**
+ * Class Tax
+ * @package Hiboutik\Api\Client\Entity
+ */
 class Tax
 {
     /**

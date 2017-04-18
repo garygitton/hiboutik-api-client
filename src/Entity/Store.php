@@ -1,7 +1,10 @@
 <?php
-
 namespace Hiboutik\Api\Client\Entity;
 
+/**
+ * Class Store
+ * @package Hiboutik\Api\Client\Entity
+ */
 class Store
 {
     /**
