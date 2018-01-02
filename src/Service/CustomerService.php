@@ -17,20 +17,17 @@ class CustomerService extends HiboutikService
     public function getByEmail($email)
     {
         $customer = new Customer();
-        $customer->setIsNew(false);
 
         try {
             $dataCustomers = $this->client->fetchAll('search/customers?email=' . $email);
+            $customer->exchangeArray($dataCustomers[0]);
         } catch (\Exception $e) {
-
             $customer->setEmail($email);
-            $customer->setIsNew(true);
 
-            $this->client->create('customers', $customer);
-            $dataCustomers = $this->client->fetchAll('search/customers?email=' . $customer->getEmail());
+            $data = $this->client->create('customers', $customer);
+            $dataCustomer = $this->client->fetchAll('/customer/' .$data['customers_id']);
+            $customer->exchangeArray($dataCustomer);
         }
-
-        $customer->exchangeArray($dataCustomers[0]);
 
         return $customer;
     }
