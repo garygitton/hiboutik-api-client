@@ -20,14 +20,14 @@ class CustomerService extends HiboutikService
 
         try {
             $dataCustomers = $this->client->fetchAll('search/customers?email=' . $email);
-            $customer->exchangeArray($dataCustomers[0]);
         } catch (\Exception $e) {
-            $customer->setEmail($email);
-
             $data = $this->client->create('customers', $customer);
-            $dataCustomer = $this->client->fetchAll('/customer/' .$data['customers_id']);
-            $customer->exchangeArray($dataCustomer);
+            sleep(1);
+            $dataCustomers = $this->client->fetchAll('/customer/' .$data['customers_id']);
         }
+
+        $customer->exchangeArray($dataCustomers[0]);
+        $customer->setEmail($email);
 
         return $customer;
     }
