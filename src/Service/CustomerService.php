@@ -12,24 +12,73 @@ class CustomerService extends HiboutikService
 {
     /**
      * @param $email
-     * @return Customer
+     * @return Customer|null
      */
-    public function getByEmail($email)
+    public function getOneByEmail($email)
     {
-        $customer = new Customer();
+        $customer = $this->findOneByEmail($email);
 
-        try {
-            $dataCustomers = $this->client->fetchAll('search/customers?email=' . $email);
-        } catch (\Exception $e) {
-            $data = $this->client->create('customers', $customer);
-            sleep(1);
-            $dataCustomers = $this->client->fetchAll('/customer/' .$data['customers_id']);
+        if (! $customer instanceof Customer) {
+            $customer = new Customer();
+            $customer->setEmail($email);
+
+            $this->create($customer);
         }
 
+        return $customer;
+    }
+
+    public function findOneByEmail($email)
+    {
+        try {
+            $dataCustomers = $this->client->fetchAll('search/customers?email=' . $email);
+        } catch(\Exception $e) {
+            return null;
+        }
+
+        $customer = new Customer();
         $customer->exchangeArray($dataCustomers[0]);
-        $customer->setEmail($email);
 
         return $customer;
+    }
+
+    public function findAll()
+    {
+        try {
+            $dataCustomers = $this->client->fetchAll("/customers");
+        } catch(\Exception $e) {
+            return null;
+        }
+
+        $customers = [];
+        foreach($dataCustomers as $dataCustomer) {
+            $customer = new Customer();
+            $customer->exchangeArray($dataCustomer);
+
+            $customers[] = $customer;
+        }
+
+        return $customers;
+    }
+
+    public function find($id)
+    {
+        try {
+            $dataCustomers = $this->client->fetchAll("/customer/$id");
+        } catch(\Exception $e) {
+            return null;
+        }
+
+        $customer = new Customer();
+        $customer->exchangeArray($dataCustomers[0]);
+
+        return $customer;
+    }
+
+    public function create(Customer $customer)
+    {
+        $customerData = $this->client->create('customers', $customer);
+        $customer->exchangeArray($customerData);
     }
 
     /**
@@ -54,7 +103,7 @@ class CustomerService extends HiboutikService
         ];
 
         foreach ($customerData as $attribute => $value) {
-            if(in_array($attribute, $ignoredAttributes)) {
+            if (in_array($attribute, $ignoredAttributes)) {
                 continue;
             }
 
