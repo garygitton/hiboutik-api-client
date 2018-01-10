@@ -44,15 +44,6 @@ class HiboutikApiClient
         $dataRow = (array) $data[0];
 
         return $dataRow;
-
-        $entity = $this->createEntityWithResourceName($resource);
-
-        $hydrator = new HiboutikApiClientHydrator();
-        $hydrator->hydrate($dataRow, $entity);
-
-        $data = $this->reduceDataKey((array) $data[0]);
-
-        return $entity;
     }
 
     /**
